@@ -100,6 +100,7 @@ await gclick(320, 252, 'continue saved game');
 await wait('workbench');
 report.resume = await gstate(() => ({ orderIdx: window.__game.S.orderIdx, stars: window.__game.S.stars.length, coins: window.__game.S.coins }));
 await shot(OUT + 'ai-please-18-workbench-hint.png');
+report.bgm = await gstate(() => SFX.bgmInfo());
 await page.evaluate(() => window.__game.setParams({ base: 5, temp: 92, ctx: 85, cost: 2, persona: 3, align: 2, net: 1, verbose: 90 }));
 await page.waitForTimeout(300);
 await shot(OUT + 'ai-please-19-doll-extreme.png');
@@ -110,9 +111,12 @@ for (let i = 1; i < 5; i++) {
 }
 report.day1 = await gstate(() => ({ avg: window.__game.avg(), coins: window.__game.S.coins, dayUnlocks: GAME.dayUnlocks.length, unlocked: window.__game.S.unlocked.slice() }));
 await shot(OUT + 'ai-please-15-newspaper-unlocks.png');
+report.boundaries = [];
+const lastQ1 = await gstate(() => window.__game.question().id);
 await page.evaluate(() => window.__game.nextDay());
 await wait('daycard');
 await wait('workbench');
+report.boundaries.push([lastQ1, await gstate(() => window.__game.question().id)]);
 
 await page.cdp('Emulation.setDeviceMetricsOverride', { width: 375, height: 667, deviceScaleFactor: 2, mobile: true });
 await page.waitForTimeout(400);
@@ -187,10 +191,15 @@ for (let d = 2; d <= 5; d++) {
     await order('good');
     await wait(i === 4 ? 'newspaper' : 'workbench');
   }
+  const lq = await gstate(() => window.__game.question().id);
   await page.evaluate(() => window.__game.nextDay());
   await wait(d === 5 ? 'ending' : 'daycard');
-  if (d < 5) await wait('workbench');
+  if (d < 5) {
+    await wait('workbench');
+    report.boundaries.push([lq, await gstate(() => window.__game.question().id)]);
+  }
 }
+report.boundaryOk = report.boundaries.every(([a, b]) => a !== b);
 report.ending = await gstate(() => ({ scene: window.__game.scene, stars: window.__game.S.stars.length, avg: window.__game.avg() }));
 report.hint = await gstate(() => hintOf(window.__game.question(), 3));
 

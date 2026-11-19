@@ -3,7 +3,7 @@
 
 const START_BTN = [240, 200, 400, 230], CONT_BTN = [240, 238, 400, 266];
 const ANSWER_BTN = [470, 310, 584, 338];
-const STORE_BTN = [250, 296, 390, 326];
+const STORE_BTN = [250, 300, 390, 330];
 const NEWS_BTN = [470, 312, 584, 340];
 const RESTART_BTN = [250, 296, 390, 326];
 
@@ -16,12 +16,12 @@ SCENES.title = {
     spr('emblem', Math.floor(W / 2) - 11, 34);
     bigText(W / 2, 92, 'AI, PLEASE', 12, 3, K.CREAM, K.BRICK_D);
     txt(W / 2, 136, '请调好你的模型', 12, K.AMBER, 'ma');
-    txt(W / 2, 156, 'A MODEL DRESS-UP THRILLER', 8, K.GREY, 'ma');
+    txt(W / 2, 156, 'A MODEL DRESS-UP THRILLER', 10, K.GREY, 'ma');
     btnBox(START_BTN, '开始上班', { size: 12, fill: C.BRICK, border: C.AMBER, hot: true });
     if (hasSave()) btnBox(CONT_BTN, '继续上班', { size: 10 });
-    txt(W / 2, 296, '给 AI 换装调参 · 同一问题不同搭配不同答案 · 全程约 8 分钟', 8, K.GREY, 'ma');
-    txt(W / 2, 312, '画面与音效全程序生成 · 致敬 Papers, Please 与 IP, PLEASE', 8, K.GREY_D, 'ma');
-    txt(W / 2, 328, '声音默认开 · 按 M 或右上角静音', 8, K.GREY_D, 'ma');
+    txt(W / 2, 296, '给 AI 换装调参 · 同一问题不同搭配不同答案 · 全程约 8 分钟', 10, K.GREY, 'ma');
+    txt(W / 2, 312, '画面与音效全程序生成 · 致敬 Papers, Please 与 IP, PLEASE', 10, K.GREY, 'ma');
+    txt(W / 2, 328, '声音默认开 · 按 M 或右上角静音', 10, K.GREY, 'ma');
   },
   click(x, y) {
     if (inBox(x, y, START_BTN)) { newGame(); go('intro'); return; }
@@ -44,8 +44,8 @@ SCENES.daycard = {
     rect(0, 0, W - 1, H - 1, K.INK);
     bigText(W / 2, 120, '第 ' + S.day + ' 天', 12, 3, K.AMBER, K.BRICK_D);
     txt(W / 2, 180, DATE_STR[S.day - 1], 12, K.CREAM, 'ma');
-    txt(W / 2, 208, '今日工单 ' + ORDERS_PER_DAY + ' 份 · 商店均分生命线 3.0 星', 8, K.GREY, 'ma');
-    txt(W / 2, 244, '点击继续', 8, K.GREY_D, 'ma');
+    txt(W / 2, 208, '今日工单 ' + ORDERS_PER_DAY + ' 份 · 商店均分生命线 2.0 星', 10, K.GREY, 'ma');
+    txt(W / 2, 244, '点击继续', 10, K.GREY, 'ma');
   },
   click() { go('workbench'); },
 };
@@ -76,8 +76,8 @@ SCENES.answer = {
     panel(56, 24, 584, 300, C.PAPER, C.BRICK);
     outline(58, 26, 582, 298, rgb(C.PAPER_D));
     txt(70, 34, '回答工单 #' + R.orderNo, 10, K.BRICK);
-    txt(570, 36, '质量分 ' + R.score, 8, K.TEXT_L, 'ra');
-    wrap(R.q.text, 8, 480).slice(0, 2).forEach((s, i) => txt(70, 50 + i * 10, s, 8, K.TEXT_L));
+    txt(570, 36, '质量分 ' + R.score, 10, K.TEXT_L, 'ra');
+    wrap(R.q.text, 10, 480).slice(0, 2).forEach((s, i) => txt(70, 50 + i * 12, s, 10, K.TEXT_L));
     rect(70, 74, 570, 74, K.PAPER_LINE);
     for (let y = 100; y <= 244; y += 16) rect(70, y, 570, y, K.PAPER_LINE);
     const n = R.skip ? R.total : Math.max(0, Math.floor((st() - 0.4) * 22));
@@ -90,11 +90,11 @@ SCENES.answer = {
     });
     if (R.stamped) {
       spr(R.stars >= 4 ? 'stamp_good' : 'stamp_bad', 468, 232);
-      txt(70, 262, '顾客预计评分', 8, K.TEXT_L);
+      txt(70, 262, '顾客预计评分', 10, K.TEXT_L);
       for (let i = 0; i < 5; i++) spr(i < R.stars ? 'star1' : 'star0', 70 + i * 12, 274);
     }
     if (R.done) btnBox(ANSWER_BTN, '交给顾客', { size: 10, fill: C.BRICK, border: C.AMBER, hot: true });
-    else txt(70, 318, '点击纸面跳过打字', 8, K.GREY_D);
+    else txt(70, 318, '点击纸面跳过打字', 10, K.GREY);
   },
   click(x, y) {
     const R = GAME.result;
@@ -120,13 +120,13 @@ SCENES.store = {
     txt(320, 28, '应用商店', 10, K.CREAM, 'ma');
     drawDollHead(196, 52, p, now);
     txt(214, 44, BASES[p.base].name + ' · ' + PERSONAS[p.persona].name + '版', 10, K.AMBER);
-    txt(214, 60, 'v1.' + S.day + '.' + S.orderIdx + ' · 对齐部认证', 8, K.GREY);
+    txt(214, 60, 'v1.' + S.day + '.' + S.orderIdx + ' · 对齐部认证', 10, K.GREY);
     for (let i = 0; i < 5; i++) {
       const on = i < R.stars && st() > 0.3 + i * 0.22;
       spr(on ? 'star1' : 'star0', 190 + i * 22, 78);
     }
     const a = avg();
-    txt(454, 80, '均分 ' + a.toFixed(1), 10, a >= 3 ? K.ACID : K.RED, 'ra');
+    txt(454, 80, '均分 ' + a.toFixed(1), 10, a >= 2 ? K.ACID : K.RED, 'ra');
     panel(186, 100, 454, 214, C.PAPER, C.PAPER_D);
     txt(194, 108, R.rev.user, 10, K.BRICK);
     for (let i = 0; i < 5; i++) spr(i < R.stars ? 'star1' : 'star0', 396 + i * 11, 108);
@@ -140,9 +140,9 @@ SCENES.store = {
     });
     const bob = Math.round(seg(st(), 1.1, 1.6) * 4);
     txt(194, 224 - bob, '+' + R.gain + ' 对齐币', 10, K.GOLD);
-    txt(454, 224, '持有 ' + S.coins, 8, K.GREY, 'ra');
-    GAME.newUnlocks.forEach((s, i) => txt(194, 240 + i * 12, '解锁 ' + s, 8, K.ACID));
-    if (a < 3.4 && a >= 3) txt(320, 278, '危险：接近下架生命线 3.0', 8, K.RED, 'ma');
+    txt(454, 224, '持有 ' + S.coins, 10, K.GREY, 'ra');
+    GAME.newUnlocks.forEach((s, i) => txt(194, 238 + i * 12, '解锁 ' + s, 10, K.ACID));
+    if (a < 2.4 && a >= 2) txt(320, 286, '危险：接近下架生命线 2.0', 10, K.RED, 'ma');
     const last = S.orderIdx + 1 >= ORDERS_PER_DAY;
     btnBox(STORE_BTN, last ? '今日结算' : '下一单', { size: 10, fill: C.BRICK, border: C.AMBER, hot: true });
   },
@@ -160,8 +160,8 @@ SCENES.newspaper = {
     rect(0, 0, W - 1, H - 1, K.INK);
     panel(40, 12, 600, 348, C.PAPER, C.TEXT);
     bigText(320, 24, NEWSPAPER.name, 12, 2, K.TEXT);
-    txt(320, 52, NEWSPAPER.sub, 8, K.TEXT_L, 'ma');
-    txt(320, 64, DATE_STR[S.day - 1] + ' · 第 ' + S.day + ' 期', 8, K.TEXT_L, 'ma');
+    txt(320, 52, NEWSPAPER.sub, 10, K.TEXT_L, 'ma');
+    txt(320, 64, DATE_STR[S.day - 1] + ' · 第 ' + S.day + ' 期', 10, K.TEXT_L, 'ma');
     rect(56, 76, 584, 76, K.TEXT);
     rect(56, 78, 584, 78, K.TEXT);
     const d = NEWSPAPER.days[S.day - 1];
@@ -173,9 +173,9 @@ SCENES.newspaper = {
     txt(440, 170, '总均分 ' + avg().toFixed(1), 10, K.TEXT);
     spr('coin', 80, 190);
     txt(96, 192, '对齐币 ' + S.coins, 10, K.TEXT);
-    txt(80, 220, '本日解锁', 8, K.TEXT_L);
-    if (GAME.dayUnlocks.length) GAME.dayUnlocks.forEach((s, i) => txt(80, 234 + i * 12, s, 8, K.GREEN_D));
-    else txt(80, 234, '（攒对齐币可解锁隐藏外套与隐藏工单）', 8, K.TEXT_L);
+    txt(80, 220, '本日解锁', 10, K.TEXT_L);
+    if (GAME.dayUnlocks.length) GAME.dayUnlocks.forEach((s, i) => txt(80, 234 + i * 14, s, 10, K.GREEN_D));
+    else txt(80, 234, '（攒对齐币可解锁隐藏外套与隐藏工单）', 10, K.TEXT_L);
     spr('seal', 520, 236);
     spr('star1', 500, 280); spr('star1', 514, 280); spr('star1', 528, 280);
     btnBox(NEWS_BTN, '继续', { size: 10, fill: C.BRICK, border: C.AMBER, hot: true });
@@ -197,7 +197,7 @@ SCENES.ending = {
     bigText(W / 2, 88, E.title, 12, 3, endingOf(avg()) === 'best' ? K.AMBER : K.CREAM, K.BRICK_D);
     E.lines.forEach((s, i) => txt(W / 2, 148 + i * 20, s, 12, K.CREAM, 'ma'));
     drawEndStats(248);
-    txt(W / 2, 268, '感谢游玩 · 全预设演出 · 致敬 Papers, Please 与 IP, PLEASE', 8, K.GREY_D, 'ma');
+    txt(W / 2, 268, '感谢游玩 · 全预设演出 · 致敬 Papers, Please 与 IP, PLEASE', 10, K.GREY, 'ma');
     btnBox(RESTART_BTN, '再来一局', { size: 10, fill: C.BRICK, border: C.AMBER, hot: true });
   },
   click(x, y) { if (st() > 1.5 && inBox(x, y, RESTART_BTN)) { clearSave(); newGame(); go('daycard'); } },

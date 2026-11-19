@@ -45,7 +45,7 @@ function drawCtrl(c) {
   const [x0, y0, x1, y1] = c.box;
   const p = WB.params;
   panel(x0, y0, x1, y1, C.DESK_D, C.OUTLINE);
-  txt(x0 + 5, y0 + 3, c.label, 8, K.GREY);
+  txt(x0 + 5, y0 + 3, c.label, 10, K.GREY);
   const wy = y0 + 14;
   if (c.kind === 'select') {
     triBtn([x0 + 4, wy, x0 + 20, y1 - 4], -1);
@@ -59,7 +59,7 @@ function drawCtrl(c) {
     rect(tx0, wy + 6, kx, wy + 8, K.AMBER_D);
     rect(kx - 3, wy + 1, kx + 3, wy + 13, K.AMBER);
     outline(kx - 3, wy + 1, kx + 3, wy + 13, K.INK);
-    txt(x1 - 6, wy + 2, ctrlValueText(c), 8, K.CREAM, 'ra');
+    txt(x1 - 6, wy + 2, ctrlValueText(c), 10, K.CREAM, 'ra');
   } else if (c.kind === 'step') {
     btnBox([x0 + 4, wy, x0 + 24, y1 - 4], '-', { size: 10, fill: C.DESK, border: C.GREY_D });
     btnBox([x1 - 24, wy, x1 - 4, y1 - 4], '+', { size: 10, fill: C.DESK, border: C.GREY_D });
@@ -71,7 +71,7 @@ function drawCtrl(c) {
       const on = p.align === i;
       rect(b[0], b[1], b[2], b[3], rgb(on ? C.BRICK : C.DESK));
       outline(b[0], b[1], b[2], b[3], rgb(on ? C.AMBER : C.GREY_D));
-      txt(Math.floor((b[0] + b[2]) / 2), b[1] + 3, ALIGNS[i], 8, on ? K.CREAM : K.GREY, 'ma');
+      txt(Math.floor((b[0] + b[2]) / 2), b[1] + 3, ALIGNS[i], 10, on ? K.CREAM : K.GREY, 'ma');
     }
   } else if (c.kind === 'toggle') {
     const on = !!p.net;
@@ -79,7 +79,7 @@ function drawCtrl(c) {
     rect(b[0], b[1], b[2], b[3], rgb(on ? C.GREEN_D : C.DESK));
     outline(b[0], b[1], b[2], b[3], rgb(on ? C.ACID : C.GREY_D));
     rect(on ? b[2] - 8 : b[0] + 2, b[1] + 2, on ? b[2] - 2 : b[0] + 8, b[3] - 2, rgb(on ? C.ACID : C.GREY));
-    txt(x0 + 38, wy + 2, on ? '开 · 天线已装' : '关 · 离线模式', 8, on ? K.ACID : K.GREY);
+    txt(x0 + 38, wy + 2, on ? '开 · 天线已装' : '关 · 离线模式', 10, on ? K.ACID : K.GREY);
   }
 }
 
@@ -104,9 +104,9 @@ function drawQueue() {
   rect(548, 60, 576, 88, K.BOOTH_WALL);
   rect(552, 66, 566, 80, K.AMBER_D);
   tinyPerson(560, 88, rgb(cust.coat), cust.hat ? rgb(cust.hat) : null, 0);
-  const nw = tw(cust.name, 8) + 8;
+  const nw = tw(cust.name, 10) + 8;
   rect(560 - nw / 2, 44, 560 + nw / 2, 56, rgba(C.INK, 0.8));
-  txt(560, 46, cust.name, 8, K.CREAM, 'ma');
+  txt(560, 46, cust.name, 10, K.CREAM, 'ma');
 }
 
 function exportCard() {
@@ -155,7 +155,7 @@ SCENES.workbench = {
     drawBg();
     drawQueue();
     // 娃娃展示台
-    panel(8, 104, 176, 300, C.DESK_D, C.OUTLINE);
+    panel(8, 104, 176, 316, C.DESK_D, C.OUTLINE);
     line(92, 104, 92, 126, K.METAL_D);
     rect(84, 126, 100, 132, K.METAL);
     rect(86, 132, 98, 134, K.AMBER);
@@ -165,30 +165,30 @@ SCENES.workbench = {
     rect(20, 258, 164, 262, K.COUNTER_D);
     drawDoll(92, 250, WB.params, now, ptr.down ? 'talk' : 'idle');
     txt(92, 266, BASES[WB.params.base].name, 10, K.AMBER, 'ma');
-    const pv = wrap(personaPreview(WB.params), 8, 160);
-    pv.slice(0, 3).forEach((s, i) => txt(92, 280 + i * 10, s, 8, K.GREY, 'ma'));
+    const pv = wrap(personaPreview(WB.params), 10, 160);
+    pv.slice(0, 3).forEach((s, i) => txt(92, 280 + i * 10, s, 10, K.GREY, 'ma'));
     // 工单条
-    panel(184, 104, 632, 140, C.DESK_D, C.OUTLINE);
-    txt(190, 108, '工单 #' + (S.orderIdx + 1) + ' / ' + ORDERS_PER_DAY, 8, K.AMBER);
+    panel(184, 104, 632, 142, C.DESK_D, C.OUTLINE);
+    txt(190, 108, '工单 #' + (S.orderIdx + 1) + ' / ' + ORDERS_PER_DAY, 10, K.AMBER);
     const q = currentQuestion();
     wrap(q.text, 10, 392).slice(0, 2).forEach((s, i) => txt(190, 119 + i * 12, s, 10, K.CREAM));
     triBtn(Q_PREV, -1);
     triBtn(Q_NEXT, 1);
     // 控件
     for (const c of CTRL) drawCtrl(c);
-    // 顾客纸条：揭示六维偏好中的五维，留一维给实验
+    // 顾客喜好纸条：揭示六维偏好中的五维，被掩的一维写明维度名＋随缘
     panel(184, 284, 632, 300, C.PAPER, C.BRICK_D);
-    txt(190, 289, '顾客纸条：' + hintOf(q, S.stars.length + S.day), 8, K.TEXT);
+    txt(190, 288, '顾客喜好纸条：' + hintOf(q, S.stars.length + S.day), 10, K.TEXT);
     // 底排
     btnBox(ASK_BTN, '提 问', { size: 12, fill: C.BRICK, border: C.AMBER, hot: true });
     btnBox(RAND_BTN, '随机', { size: 10 });
     btnBox(RESET_BTN, '重置', { size: 10 });
     btnBox(EXPORT_BTN, '导出搭配卡', { size: 8 });
     // 时钟
-    txt(10, 334, DATE_STR[S.day - 1], 8, K.GREY);
+    txt(10, 334, DATE_STR[S.day - 1], 10, K.GREY);
     const mins = 3 + S.orderIdx * 40;
     txt(10, 346, '0' + (6 + Math.floor(mins / 60)) + ':' + String(mins % 60).padStart(2, '0'), 10, K.LED);
-    txt(176, 346, '生命线 3.0 星', 8, K.GREY_D, 'ra');
+    txt(176, 346, '生命线 2.0 星', 10, K.GREY, 'ra');
   },
   down(x, y) {
     if (inBox(x, y, ASK_BTN)) {

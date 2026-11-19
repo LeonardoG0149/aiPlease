@@ -293,18 +293,41 @@ const SFX = (() => {
 
   const mf = (m) => 440 * 2 ** ((m - 69) / 12);
   // 轻快店铺小调（C 大调，替换原苏式进行曲）
-  const THEME = [
-    [[72, 1], [74, .5], [76, .5], [79, 1], [76, 1]],
-    [[77, 1.5], [76, .5], [74, 2]],
-    [[72, 1], [76, .5], [77, .5], [79, 1], [81, 1]],
-    [[79, 3], [null, 1]],
-    [[84, 1], [81, .5], [79, .5], [77, 1], [76, 1]],
-    [[77, 1], [79, .5], [77, .5], [76, 1], [74, 1]],
-    [[76, 1], [74, .5], [72, .5], [71, 1], [74, 1]],
-    [[72, 3], [null, 1]],
+  // 电子风格店铺曲：俏皮合成器语汇（弹跳_sub贝斯/八分琶音/铃铛点缀），旋律原创
+  const CH2 = [
+    [36, [60, 64, 67, 72]], [36, [60, 64, 67, 72]], [33, [57, 60, 64, 69]], [33, [57, 60, 64, 69]],
+    [41, [53, 57, 60, 65]], [41, [53, 57, 60, 65]], [43, [55, 59, 62, 67]], [43, [55, 59, 62, 67]],
+    [33, [57, 60, 64, 72]], [41, [53, 57, 60, 69]], [36, [60, 64, 67, 76]], [43, [55, 59, 62, 74]],
+    [33, [57, 60, 64, 72]], [41, [53, 57, 60, 69]], [38, [50, 53, 57, 62]], [43, [55, 59, 62, 67]],
+    [36, [60, 64, 67, 72]], [36, [60, 64, 67, 72]], [33, [57, 60, 64, 69]], [33, [57, 60, 64, 69]],
+    [41, [53, 57, 60, 65]], [41, [53, 57, 60, 65]], [43, [55, 59, 62, 67]], [43, [55, 59, 62, 67]],
   ];
-  const CHORDS = [[48, [72, 76, 79]], [43, [71, 74, 77]], [48, [72, 76, 79]], [43, [71, 74, 77]],
-    [45, [72, 76, 81]], [41, [72, 77, 81]], [43, [71, 74, 79]], [48, [72, 76, 79]]];
+  const MELO2 = [
+    [[72, .5], [72, .5], [74, .5], [76, .5], [79, 1], [76, 1]],
+    [[77, 1], [76, .5], [74, .5], [72, 2]],
+    [[69, .5], [72, .5], [76, .5], [72, .5], [69, 1], [64, 1]],
+    [[65, 1.5], [64, .5], [60, 2]],
+    [[65, .5], [69, .5], [72, .5], [74, .5], [72, 1], [69, 1]],
+    [[70, 1], [69, .5], [67, .5], [65, 2]],
+    [[67, .5], [71, .5], [74, .5], [71, .5], [67, 1], [62, 1]],
+    [[62, 1], [60, .5], [59, .5], [60, 2]],
+    [[76, 2], [72, 1], [69, 1]],
+    [[72, 2], [69, 1], [65, 1]],
+    [[74, 2], [71, 1], [67, 1]],
+    [[71, 2], [67, 1], [62, 1]],
+    [[72, 1.5], [74, .5], [76, 2]],
+    [[77, 1.5], [76, .5], [72, 2]],
+    [[74, 1], [72, .5], [69, .5], [65, 2]],
+    [[67, 1.5], [69, .5], [71, 2]],
+    [[72, .5], [72, .5], [74, .5], [76, .5], [79, 1], [84, 1]],
+    [[81, 1], [79, .5], [77, .5], [76, 2]],
+    [[69, .5], [72, .5], [76, .5], [72, .5], [81, 1], [76, 1]],
+    [[77, 1.5], [76, .5], [72, 2]],
+    [[65, .5], [69, .5], [72, .5], [74, .5], [77, 1], [74, 1]],
+    [[75, 1], [74, .5], [72, .5], [70, 2]],
+    [[74, .5], [71, .5], [67, .5], [71, .5], [74, 1], [79, 1]],
+    [[76, 1], [74, .5], [72, .5], [71, 2]],
+  ];
 
   function lead(m, dur) {
     const n = N(dur), f = new Float32Array(n);
@@ -329,31 +352,56 @@ const SFX = (() => {
   }
 
   const kick = () => { const n = N(0.3); return mul(sine(lin(75, 45, n), n), decay(n, 0.09)); };
-  const snare = (s) => { const n = N(0.14); return add(mul(filt(noise(n, 500 + s), 'bandpass', [1500, 6000]), decay(n, 0.04)), mul(sine(190, n), decay(n, 0.03)), 0.5); };
 
-  function march(bars, bpm = 104, drums = true, leadG = 1, tail = 1.5) {
+  function pluck(m, dur, tau = 0.09) {
+    const n = N(dur);
+    const x = add(square(mf(m), n, 0.35), square(mf(m) * 1.005, n, 0.35), 0.7);
+    return filt(fade(mul(x, decay(n, tau)), 0.002, 0.03), 'lowpass', 3200);
+  }
+
+  const sub2 = (m, dur) => fade(mul(add(sine(mf(m), N(dur)), tri(mf(m) * 2, N(dur)), 0.3), decay(N(dur), 0.18)), 0.004, 0.04);
+
+  function pad2(chord, dur) {
+    const n = N(dur);
+    let x = new Float32Array(n);
+    for (const m of chord) x = add(x, add(square(mf(m - 12) * 0.994, n), square(mf(m - 12) * 1.006, n), 1), 1 / (chord.length * 2));
+    return filt(fade(x, 0.05, 0.3), 'lowpass', 1100);
+  }
+
+  const hat = (open, seed) => mul(filt(noise(N(open ? 0.12 : 0.045), seed), 'highpass', 6500), decay(N(open ? 0.12 : 0.045), open ? 0.05 : 0.015));
+  const clap = (seed) => mul(filt(noise(N(0.09), seed), 'bandpass', [1200, 4500]), decay(N(0.09), 0.035));
+  const glint = (m, dur) => fade(mul(add(sine(mf(m), N(dur)), sine(mf(m) * 2.01, N(dur)), 0.4), decay(N(dur), 0.35)), 0.002, 0.05);
+
+  function groove(bars, bpm = 126, drums = true, tail = 0.6) {
     const beat = 60 / bpm, bar = 4 * beat;
     const out = new Float32Array(N(bars.length * bar + tail));
     bars.forEach((b, bi) => {
       const t0 = bi * bar;
+      const zen = b >= 8 && b < 16;
+      const [root, tones] = CH2[b];
       let tt = t0;
-      for (const [m, beats] of THEME[b]) {
-        if (m) {
-          const last = bi === bars.length - 1 && beats >= 3;
-          place(out, tt, lead(m, beats * beat * (last ? 1.4 : 0.92)), 0.33 * leadG);
-        }
+      for (const [m, beats] of MELO2[b]) {
+        if (m) place(out, tt, pluck(m, beats * beat * 0.95, Math.min(0.35, beats * beat * 0.5)), zen ? 0.22 : 0.3);
         tt += beats * beat;
       }
-      const [root, chord] = CHORDS[b];
-      for (let k = 0; k < 4; k++) place(out, t0 + k * beat, bass(k % 2 === 0 ? root : root + 7, beat * 0.85), 0.3);
-      place(out, t0, pad(chord, bar), 0.1);
-      if (drums) {
+      const steps = zen ? [0, 2, 1, 3] : [0, 1, 2, 3, 2, 1, 0, 1];
+      steps.forEach((ti, k) => place(out, t0 + k * (zen ? beat : beat / 2), pluck(tones[ti] + 12, zen ? 0.5 : 0.22, zen ? 0.2 : 0.07), zen ? 0.07 : 0.1));
+      [[0, 0.9, 0], [1.5, 0.4, 12], [2, 0.9, 0], [3.5, 0.4, 12]].forEach(([bt, du, oct]) => place(out, t0 + bt * beat, sub2(root + oct, du * beat), zen ? (oct ? 0.07 : 0.12) : (oct ? 0.14 : 0.24)));
+      place(out, t0, pad2(tones, bar), zen ? 0.04 : 0.06);
+      if (drums && !zen) {
         for (let k = 0; k < 4; k++) {
-          if (k % 2 === 0) place(out, t0 + k * beat, kick(), 0.5);
-          else place(out, t0 + k * beat, snare(k + bi), 0.22);
+          if (k % 2 === 0) place(out, t0 + k * beat, kick(), 0.45);
+          else place(out, t0 + k * beat, clap(bi * 4 + k), 0.16);
         }
-        if (b === 3 || b === 7) for (let r = 0; r < 4; r++) place(out, t0 + 3 * beat + r * beat / 4, snare(20 + r), 0.12 + 0.03 * r);
+        for (let k = 0; k < 8; k++) place(out, t0 + k * beat / 2, hat(k === 6, bi * 8 + k), k % 2 ? 0.07 : 0.045);
+      } else if (drums) {
+        for (let k = 0; k < 4; k++) place(out, t0 + k * beat, hat(false, bi * 4 + k), 0.035);
       }
+      if (b % 4 === 3) {
+        const r = rng(b * 17 + 3);
+        place(out, t0 + 3.5 * beat, glint([84, 86, 88, 91, 93][Math.floor(r() * 5)], 0.8), 0.12);
+      }
+      if (drums && (b === 7 || b === 15 || b === 23)) for (let r = 0; r < 4; r++) place(out, t0 + 3 * beat + r * beat / 4, clap(90 + r), 0.08 + 0.03 * r);
     });
     return norm(out, 0.6);
   }
@@ -398,16 +446,16 @@ const SFX = (() => {
     citation: () => beep2(330, 0.15, 247, 0.3, 0.22, 0.12),
     tray: () => tray(false), tray_back: () => tray(true),
     stamp_deny: () => stamp('deny'), stamp_approve: () => stamp('approve'),
-    title: () => march([0, 1, 2, 3]),
-    end: () => march([4, 5, 6, 7]),
-    sad: () => norm(march([6, 7], 84, false, 0.8, 2.0), 0.4),
+    title: () => groove([0, 1, 2, 3], 126, true, 1.2),
+    end: () => groove([16, 17, 18, 19, 20, 21, 22, 23], 126, true, 1.5),
+    sad: () => norm(groove([8, 9, 10, 11], 84, false, 2.0), 0.4),
     day_hit: dayHit,
     fight: () => crowdFight(3.0),
     star: () => beep2(880, 0.06, 1318, 0.14, 0.2, 0.1),
     bad: () => beep2(196, 0.16, 98, 0.34, 0.26, 0.14),
     coin: () => norm(filt(fade(cat(square(988, N(0.05)), square(1319, N(0.12)))), 'lowpass', 4000), 0.2),
     unlock: () => fanfare(),
-    shop: () => march([0, 1, 2, 3, 4, 5, 6, 7], 112, true, 0.8, 0.3),
+    shop: () => groove([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], 126, true, 0.6),
   };
 
   function buffer(name, make) {
@@ -443,7 +491,7 @@ const SFX = (() => {
       // 空闲时把常用音效先合成好，避免第一次播放卡顿
       const warm = ['click', 'select', 'stamp_deny', 'stamp_approve', 'tray', 'tray_back', 'discrepancy', 'inspect_on',
         'inspect_off', 'thud', 'intercom', 'citation', 'detain', 'scuffle', 'day_hit', 'whoosh', 'sad', 'bell',
-        'xray', 'gunshot', 'star', 'bad', 'coin'];
+        'xray', 'gunshot', 'star', 'bad', 'coin', 'shop'];
       let i = 0;
       const step = () => { if (i < warm.length) { buffer(warm[i++]); setTimeout(step, 30); } };
       setTimeout(step, 50);
@@ -451,6 +499,19 @@ const SFX = (() => {
     play(name, gain = 1, when = 0) {
       if (!ac) return null;
       return playBuf(buffer(name), gain, when);
+    },
+    bgmInfo() {
+      if (!musSrc) return { dur: 0, loop: false };
+      const d = musSrc.buffer.getChannelData(0);
+      const q = Math.floor(d.length / 4);
+      const rms = [];
+      for (let k = 0; k < 4; k++) {
+        let a = 0;
+        const end = k === 3 ? d.length : (k + 1) * q;
+        for (let i = k * q; i < end; i++) a += d[i] * d[i];
+        rms.push(Math.sqrt(a / (end - k * q)));
+      }
+      return { dur: musSrc.buffer.duration, loop: musSrc.loop, rms };
     },
     paper(seed = 0) { if (ac) playBuf(buffer('paper' + (seed % 8), () => paper(seed % 8))); },
     step(seed = 0) { if (ac) playBuf(buffer('step' + (seed % 6), () => footstep(60 + (seed % 6)))); },
@@ -481,7 +542,7 @@ const SFX = (() => {
       if (!ac) return;
       if (on && !musSrc) {
         musSrc = ac.createBufferSource();
-        musSrc.buffer = buffer('shopbgm', MAKERS.shop);
+        musSrc.buffer = buffer('shop', MAKERS.shop);
         musSrc.loop = true;
         musGain = ac.createGain();
         musGain.gain.value = muted ? 0 : 0.45;

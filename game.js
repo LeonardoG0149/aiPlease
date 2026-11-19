@@ -63,7 +63,7 @@ GAME.submit = (res, score, stars, q) => {
 };
 
 GAME.advance = () => {
-  if (S.stars.length >= 2 && avg() < 3.0) { saveGame(); go('over'); return; }
+  if (S.stars.length >= 2 && avg() < 2.0) { saveGame(); go('over'); return; }
   if (S.orderIdx + 1 >= ORDERS_PER_DAY) { go('newspaper'); return; }
   S.orderIdx++;
   S.qIdx = (S.qIdx + 1) % availableQuestions().length;
@@ -79,6 +79,7 @@ GAME.nextDay = () => {
   S.day++;
   S.orderIdx = 0;
   S.dayStars = [];
+  S.qIdx = (S.qIdx + 1) % availableQuestions().length;
   saveGame();
   go('daycard');
 };

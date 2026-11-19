@@ -73,7 +73,7 @@ function drawTyped(lines) {
     if (n > 0) txt(Math.floor(W / 2 - tw(s) / 2), y, s, 12, K.CREAM, 'la', n);
     y += 18;
   }
-  txt(W - 8, H - 14, '点击跳过', 8, K.GREY_D, 'ra');
+  txt(W - 8, H - 14, '点击跳过', 10, K.GREY, 'ra');
 }
 let lastKey = -1;
 function typedSounds(lines) {

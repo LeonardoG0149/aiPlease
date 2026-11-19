@@ -72,17 +72,26 @@ function render() {
   }
 }
 
+let vw = 0, vh = 0, vd = 0;
 function loop(ts) {
   now = ts / 1000;
+  if (window.innerWidth !== vw || window.innerHeight !== vh || window.devicePixelRatio !== vd) {
+    vw = window.innerWidth; vh = window.innerHeight; vd = window.devicePixelRatio;
+    fit();
+  }
   update();
   render();
   requestAnimationFrame(loop);
 }
 
 function fit() {
+  // 整数倍设备像素缩放：pixelated 放大不丢笔画，小字更清楚
+  const dsf = Math.round((window.devicePixelRatio || 1) * 100) / 100;
   const s = Math.min(window.innerWidth / W, window.innerHeight / H);
-  canvasEl.style.width = `${Math.floor(W * s)}px`;
-  canvasEl.style.height = `${Math.floor(H * s)}px`;
+  const n = Math.floor(s * dsf);
+  const k = n >= 1 ? n / dsf : s;
+  canvasEl.style.width = `${W * k}px`;
+  canvasEl.style.height = `${H * k}px`;
 }
 
 function toggleMute() {

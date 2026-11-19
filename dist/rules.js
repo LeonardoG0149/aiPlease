@@ -70,7 +70,8 @@ const starsOf = (score) => (score >= 75 ? 5 : score >= 58 ? 4 : score >= 40 ? 3 
 function reviewFor(stars, q, seed) {
   const extra = (TAG_REVIEWS[q.id] && TAG_REVIEWS[q.id][stars]) || (TAG_REVIEWS[q.tag] && TAG_REVIEWS[q.tag][stars]) || [];
   const pool = extra.concat(REVIEWS[stars]);
-  return { user: pick(USERNAMES, seed + 7), text: pick(pool, seed) };
+  const h = hashStr(q.id);
+  return { user: pick(USERNAMES, seed + 7 + h), text: pick(pool, seed + h) };
 }
 
 const endingOf = (avg) => (avg >= 4.2 ? 'best' : 'ok');
@@ -88,13 +89,15 @@ function personaPreview(p) {
 function hintOf(q, seed) {
   const id = q.ideal;
   const seg = [
-    '底座认' + BASES[id.base].name,
-    PERSONAS[id.persona].name + '外套',
+    BASES[id.base].name,
+    PERSONAS[id.persona].name,
     id.temp >= 80 ? '要烫手' : id.temp >= 55 ? '加点温' : id.temp >= 30 ? '常温就行' : '要冰镇',
     id.ctx >= 80 ? '过目不忘' : id.ctx >= 55 ? '记性好点' : id.ctx >= 30 ? '记性一般' : '金鱼也行',
     COSTS[id.cost],
     id.align === 2 ? '宪法护体' : id.align === 0 ? '野生放养' : '持证上岗',
   ];
-  seg[seed % seg.length] = '这维随缘';
+  const dims = ['底座', '人设', '温度', '上下文', '成本', '安全'];
+  const m = seed % seg.length;
+  seg[m] = dims[m] + '随缘';
   return seg.join('·');
 }

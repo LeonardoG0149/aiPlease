@@ -169,9 +169,9 @@ def background():
         for x in range((y // 8 % 2) * 16, 640, 32):
             d.line([x, y, x, y + 7], fill=WALL_D)
     d.rectangle([60, 8, 260, 26], fill=BANNER)
-    txt(d, (160, 13), "HELPFUL · HONEST · HARMLESS", 8, CREAM, anchor="ma")
+    txt(d, (160, 12), "HELPFUL · HONEST · HARMLESS", 10, CREAM, anchor="ma")
     d.rectangle([380, 8, 580, 26], fill=BANNER)
-    txt(d, (480, 13), "荣耀归于对齐部", 8, CREAM, anchor="ma")
+    txt(d, (480, 12), "荣耀归于对齐部", 10, CREAM, anchor="ma")
     d.rectangle([430, 36, 560, 56], fill=PAPER)
     d.rectangle([430, 36, 560, 56], outline=TEXT)
     txt(d, (495, 41), "模型裁缝铺", 10, TEXT, anchor="ma")
