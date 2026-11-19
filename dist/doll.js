@@ -2,8 +2,8 @@
 // AI 娃娃分层绘制：底座体型 × 人设外套 × 温度围巾 × 上下文背包/眼镜 × 成本徽章 × 对齐宪法 × 联网天线 × 话痨气泡。
 
 function drawDoll(cx, fy, p, t, expr = 'idle') {
-  const bw = p.base === 1 ? 30 : p.base === 2 ? 24 : 22;
-  const bh = p.base === 1 ? 34 : p.base === 2 ? 28 : 26;
+  const bw = [22, 30, 24, 26, 20, 24][p.base];
+  const bh = [26, 34, 28, 30, 24, 28][p.base];
   const jit = p.temp >= 80 ? Math.round(Math.sin(t * 30)) : 0;
   const x = cx + jit, y = fy;
   const coat = PERSONAS[p.persona].coat;
@@ -27,6 +27,8 @@ function drawDoll(cx, fy, p, t, expr = 'idle') {
   if (p.persona === 5) for (let i = 0; i < 4; i++) rect(x - 6, y - bh + 5 + i * 5, x + 6, y - bh + 5 + i * 5, K.GREY_D);
   if (p.persona === 6) { rect(x - 5, y - bh + 5, x + 5, y - bh + 13, K.GOLD); txt(x, y - bh + 6, '判', 8, K.NAVY, 'ma'); }
   if (p.persona === 7) { txt(x, y - bh + 6, '废话', 8, K.GREY_D, 'ma'); txt(x, y - bh + 15, '文学', 8, K.GREY_D, 'ma'); }
+  if (p.persona === 8) { rect(x - 5, y - bh + 5, x + 5, y - bh + 12, K.CREAM); txt(x, y - bh + 5, '牛马', 8, K.BRICK_D, 'ma'); pt(x + bw / 2 - 3, y - bh + 14, K.ACID); }
+  if (p.persona === 9) { line(x - bw / 2 + 2, y - bh + 6, x + bw / 2 - 2, y - bh + 11, K.RED_L); pt(x - bw / 2 + 2, y - bh + 6, K.RED); pt(x + bw / 2 - 2, y - bh + 11, K.RED); pt(x, y - bh + 8, K.RED_L); }
   // 成本徽章
   if (p.cost === 0) { rect(x - bw / 2 + 2, y - 14, x - bw / 2 + 8, y - 8, K.DESK_L); outline(x - bw / 2 + 2, y - 14, x - bw / 2 + 8, y - 8, K.DESK_D); }
   if (p.cost === 1) { rect(x - 1, y - bh + 3, x + 1, y - bh + 12, K.NAVY); pt(x, y - bh + 13, K.NAVY_L); }
@@ -37,7 +39,7 @@ function drawDoll(cx, fy, p, t, expr = 'idle') {
   rect(x - bw / 2 + 1, y - bh - 2, x + bw / 2 - 1, y - bh + 2, sc);
   rect(x + bw / 2 - 4, y - bh + 2, x + bw / 2 - 2, y - bh + 8, sc);
   // 头
-  const hw = p.base === 1 ? 16 : 14;
+  const hw = [14, 16, 14, 15, 13, 14][p.base];
   const hy = y - bh - 14;
   rect(x - hw / 2, hy, x + hw / 2, y - bh - 2, K.SKIN);
   outline(x - hw / 2, hy, x + hw / 2, y - bh - 2, K.OUTLINE);

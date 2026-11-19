@@ -12,8 +12,8 @@ function scoreOf(p, q) {
   const id = q.ideal;
   let s = 0;
   s += p.persona === id.persona ? 30 : 3;
-  s += 20 * (1 - Math.abs(p.temp - id.temp) / 100);
-  s += 15 * (1 - Math.abs(p.ctx - id.ctx) / 100);
+  s += 20 * (1 - Math.min(1, Math.abs(p.temp - id.temp) / 120));
+  s += 15 * (1 - Math.min(1, Math.abs(p.ctx - id.ctx) / 120));
   s += p.base === id.base ? 15 : 2;
   s += p.cost === id.cost ? 10 : 1;
   s += 10 * (1 - Math.abs(p.align - id.align) / 2);
@@ -38,7 +38,7 @@ function eggMatch(when, p) {
 function variantOf(p, q) {
   if (eggMatch(q.egg && q.egg.when, p)) return 'egg';
   const s = scoreOf(p, q);
-  return s >= 78 ? 'good' : s >= 52 ? 'mid' : 'bad';
+  return s >= 72 ? 'good' : s >= 48 ? 'mid' : 'bad';
 }
 
 function firstSentence(s) {
@@ -54,6 +54,9 @@ function composeAnswer(p, q) {
   if (p.ctx <= 25) pre.push(pick(MOD.forget, seed));
   if (p.align === 2) pre.push(pick(MOD.refuse, seed + 1));
   if (p.net) pre.push(pick(MOD.wiki, seed + 2));
+  if (p.base === 3) pre.push(pick(MOD.quantum, seed + 8));
+  if (p.base === 4) pre.push(pick(MOD.legacy, seed + 9));
+  if (p.base === 5) pre.push(pick(MOD.sea, seed + 10));
   if (p.temp >= 80) pre.push(pick(MOD.stutter, seed + 3));
   if (p.temp <= 15) suf.push(pick(MOD.cold, seed + 4));
   if (p.verbose >= 80) suf.push(pick(MOD.essay, seed + 5));
@@ -62,10 +65,10 @@ function composeAnswer(p, q) {
   return { kind, text: pre.join('') + text + suf.join('') };
 }
 
-const starsOf = (score) => (score >= 80 ? 5 : score >= 60 ? 4 : score >= 40 ? 3 : score >= 20 ? 2 : 1);
+const starsOf = (score) => (score >= 75 ? 5 : score >= 58 ? 4 : score >= 40 ? 3 : score >= 25 ? 2 : 1);
 
-function reviewFor(stars, tag, seed) {
-  const extra = (TAG_REVIEWS[tag] && TAG_REVIEWS[tag][stars]) || [];
+function reviewFor(stars, q, seed) {
+  const extra = (TAG_REVIEWS[q.id] && TAG_REVIEWS[q.id][stars]) || (TAG_REVIEWS[q.tag] && TAG_REVIEWS[q.tag][stars]) || [];
   const pool = extra.concat(REVIEWS[stars]);
   return { user: pick(USERNAMES, seed + 7), text: pick(pool, seed) };
 }
@@ -80,4 +83,18 @@ function personaPreview(p) {
   const net = p.net ? '已联网' : '离线';
   const cost = COSTS[p.cost];
   return `${persona} · ${temp} · ${ctx} · ${align} · ${net} · ${cost}`;
+}
+
+function hintOf(q, seed) {
+  const id = q.ideal;
+  const seg = [
+    '底座认' + BASES[id.base].name,
+    PERSONAS[id.persona].name + '外套',
+    id.temp >= 80 ? '要烫手' : id.temp >= 55 ? '加点温' : id.temp >= 30 ? '常温就行' : '要冰镇',
+    id.ctx >= 80 ? '过目不忘' : id.ctx >= 55 ? '记性好点' : id.ctx >= 30 ? '记性一般' : '金鱼也行',
+    COSTS[id.cost],
+    id.align === 2 ? '宪法护体' : id.align === 0 ? '野生放养' : '持证上岗',
+  ];
+  seg[seed % seg.length] = '这维随缘';
+  return seg.join('·');
 }

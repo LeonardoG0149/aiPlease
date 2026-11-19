@@ -8,14 +8,14 @@ const ASK_BTN = [184, 302, 320, 350], RAND_BTN = [324, 302, 392, 350], RESET_BTN
 const Q_PREV = [592, 108, 608, 136], Q_NEXT = [612, 108, 628, 136];
 
 const CTRL = [
-  { key: 'base', kind: 'select', box: [184, 146, 408, 180], label: '底座模型' },
-  { key: 'persona', kind: 'select', box: [412, 146, 632, 180], label: '人设外套' },
-  { key: 'temp', kind: 'slider', box: [184, 184, 408, 218], label: '温度' },
-  { key: 'ctx', kind: 'slider', box: [412, 184, 632, 218], label: '上下文长度' },
-  { key: 'cost', kind: 'step', box: [184, 222, 408, 256], label: '成本档位' },
-  { key: 'align', kind: 'seg', box: [412, 222, 632, 256], label: '安全对齐' },
-  { key: 'net', kind: 'toggle', box: [184, 260, 408, 294], label: '联网搜索' },
-  { key: 'verbose', kind: 'slider', box: [412, 260, 632, 294], label: '话痨度' },
+  { key: 'base', kind: 'select', box: [184, 150, 408, 180], label: '底座模型' },
+  { key: 'persona', kind: 'select', box: [412, 150, 632, 180], label: '人设外套' },
+  { key: 'temp', kind: 'slider', box: [184, 184, 408, 214], label: '温度' },
+  { key: 'ctx', kind: 'slider', box: [412, 184, 632, 214], label: '上下文长度' },
+  { key: 'cost', kind: 'step', box: [184, 218, 408, 248], label: '成本档位' },
+  { key: 'align', kind: 'seg', box: [412, 218, 632, 248], label: '安全对齐' },
+  { key: 'net', kind: 'toggle', box: [184, 252, 408, 282], label: '联网搜索' },
+  { key: 'verbose', kind: 'slider', box: [412, 252, 632, 282], label: '话痨度' },
 ];
 
 function personaUnlocked(i) { return !PERSONAS[i].cost || S.unlocked.includes('p' + i); }
@@ -176,6 +176,9 @@ SCENES.workbench = {
     triBtn(Q_NEXT, 1);
     // 控件
     for (const c of CTRL) drawCtrl(c);
+    // 顾客纸条：揭示六维偏好中的五维，留一维给实验
+    panel(184, 284, 632, 300, C.PAPER, C.BRICK_D);
+    txt(190, 289, '顾客纸条：' + hintOf(q, S.stars.length + S.day), 8, K.TEXT);
     // 底排
     btnBox(ASK_BTN, '提 问', { size: 12, fill: C.BRICK, border: C.AMBER, hot: true });
     btnBox(RAND_BTN, '随机', { size: 10 });
@@ -200,7 +203,7 @@ SCENES.workbench = {
     if (inBox(x, y, RAND_BTN)) {
       const idx = unlockedPersonaIdx();
       Object.assign(WB.params, {
-        base: Math.floor(Math.random() * 3), temp: Math.floor(Math.random() * 101),
+        base: Math.floor(Math.random() * BASES.length), temp: Math.floor(Math.random() * 101),
         ctx: Math.floor(Math.random() * 101), cost: Math.floor(Math.random() * 3),
         persona: idx[Math.floor(Math.random() * idx.length)], align: Math.floor(Math.random() * 3),
         net: Math.random() < 0.5 ? 1 : 0, verbose: Math.floor(Math.random() * 101),
@@ -222,7 +225,7 @@ SCENES.workbench = {
       if (c.kind === 'slider') { sliderSet(c, x); WB.drag = c; SFX.play('click'); }
       else if (c.kind === 'select') {
         if (c.key === 'persona') cyclePersona(x < (x0 + x1) / 2 ? -1 : 1);
-        else p.base = (p.base + (x < (x0 + x1) / 2 ? -1 : 1) + 3) % 3;
+        else p.base = (p.base + (x < (x0 + x1) / 2 ? -1 : 1) + BASES.length) % BASES.length;
         SFX.play('select');
       } else if (c.kind === 'step') { p.cost = Math.max(0, Math.min(2, p.cost + (x < (x0 + x1) / 2 ? -1 : 1))); SFX.play('click'); }
       else if (c.kind === 'seg') { p.align = Math.max(0, Math.min(2, Math.floor((x - x0 - 4) / ((x1 - x0 - 8) / 3)))); SFX.play('click'); }

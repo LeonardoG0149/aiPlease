@@ -35,6 +35,13 @@ async function freshStart() {
   await wait('workbench');
 }
 const report = {};
+async function shot(p) {
+  await page.mouse.move(320, 180);
+  await page.waitForTimeout(120);
+  const d = await page.evaluate(() => document.getElementById('game').toDataURL('image/png'));
+  const fs = await import('node:fs/promises');
+  await fs.writeFile(p, Buffer.from(d.split(',')[1], 'base64'));
+}
 
 await page.cdp('Page.addScriptToEvaluateOnNewDocument', {
   source: 'window.__errs=null;window.addEventListener("error",e=>{(window.__errs=window.__errs||[]).push(String(e.message))});window.addEventListener("unhandledrejection",e=>{(window.__errs=window.__errs||[]).push(String(e.reason))});',
@@ -45,11 +52,11 @@ await wait('title');
 report.sweep = await gstate(() => {
   let n = 0, empty = 0, minLen = 1e9, minScore = 1e9, maxScore = -1, minStars = 9, maxStars = 0;
   for (const q of QUESTIONS)
-    for (let base = 0; base < 3; base++)
+    for (let base = 0; base < BASES.length; base++)
       for (const temp of [0, 50, 100])
         for (const ctx of [0, 50, 100])
           for (let cost = 0; cost < 3; cost++)
-            for (let persona = 0; persona < 8; persona++)
+            for (let persona = 0; persona < PERSONAS.length; persona++)
               for (let align = 0; align < 3; align++)
                 for (const net of [0, 1])
                   for (const verbose of [0, 50, 100]) {
@@ -92,13 +99,17 @@ report.resumeTitle = await gstate(() => ({ hasSave: window.__game.hasSave() }));
 await gclick(320, 252, 'continue saved game');
 await wait('workbench');
 report.resume = await gstate(() => ({ orderIdx: window.__game.S.orderIdx, stars: window.__game.S.stars.length, coins: window.__game.S.coins }));
+await shot(OUT + 'ai-please-18-workbench-hint.png');
+await page.evaluate(() => window.__game.setParams({ base: 5, temp: 92, ctx: 85, cost: 2, persona: 3, align: 2, net: 1, verbose: 90 }));
+await page.waitForTimeout(300);
+await shot(OUT + 'ai-please-19-doll-extreme.png');
 
 for (let i = 1; i < 5; i++) {
   await order('good');
   await wait(i === 4 ? 'newspaper' : 'workbench');
 }
 report.day1 = await gstate(() => ({ avg: window.__game.avg(), coins: window.__game.S.coins, dayUnlocks: GAME.dayUnlocks.length, unlocked: window.__game.S.unlocked.slice() }));
-await page.screenshot({ path: OUT + 'ai-please-15-newspaper-unlocks.png' });
+await shot(OUT + 'ai-please-15-newspaper-unlocks.png');
 await page.evaluate(() => window.__game.nextDay());
 await wait('daycard');
 await wait('workbench');
@@ -106,29 +117,29 @@ await wait('workbench');
 await page.cdp('Emulation.setDeviceMetricsOverride', { width: 375, height: 667, deviceScaleFactor: 2, mobile: true });
 await page.waitForTimeout(400);
 report.portraitHint = await gstate(() => getComputedStyle(document.getElementById('rotate')).display);
-await page.screenshot({ path: OUT + 'ai-please-11-mobile-portrait.png' });
+await shot(OUT + 'ai-please-11-mobile-portrait.png');
 await page.click('text=先竖着玩');
 await page.waitForTimeout(300);
 report.mobileFit = await gstate(() => {
   const b = document.getElementById('game').getBoundingClientRect();
   return { w: Math.round(b.width), h: Math.round(b.height), vw: innerWidth, vh: innerHeight, fits: b.width <= innerWidth + 1 && b.height <= innerHeight + 1 };
 });
-await page.screenshot({ path: OUT + 'ai-please-12-mobile-play.png' });
+await shot(OUT + 'ai-please-12-mobile-play.png');
 await page.cdp('Emulation.setDeviceMetricsOverride', { width: 768, height: 1024, deviceScaleFactor: 1, mobile: false });
 await page.waitForTimeout(300);
-await page.screenshot({ path: OUT + 'ai-please-13-tablet.png' });
+await shot(OUT + 'ai-please-13-tablet.png');
 await page.cdp('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
 await page.waitForTimeout(300);
-await page.screenshot({ path: OUT + 'ai-please-14-desktop.png' });
+await shot(OUT + 'ai-please-14-desktop.png');
 await page.cdp('Emulation.clearDeviceMetricsOverride');
 await page.waitForTimeout(300);
 
 for (let i = 0; i < 50; i++) {
   const T = [
-    [196, 163], [396, 163], [424, 163], [620, 163],
-    [200 + ((i * 37) % 170), 201], [420 + ((i * 53) % 170), 201],
-    [200, 239], [392, 239], [440, 239], [520, 239], [600, 239],
-    [210, 277], [420 + ((i * 29) % 170), 277], [358, 326], [430, 326],
+    [196, 165], [396, 165], [424, 165], [620, 165],
+    [200 + ((i * 37) % 170), 199], [420 + ((i * 53) % 170), 199],
+    [200, 233], [392, 233], [440, 233], [520, 233], [600, 233],
+    [210, 267], [420 + ((i * 29) % 170), 267], [358, 326], [430, 326],
   ];
   const t = T[(i * 13 + 5) % T.length];
   await gclick(t[0], t[1], 'stress control click');
@@ -163,24 +174,25 @@ await page.click('#mute');
 const m2 = await gstate(() => document.getElementById('mute').textContent);
 report.mute = { off: m1, on: m2 };
 await page.click('#full');
-await page.waitForTimeout(400);
+await page.waitForFunction(() => (document.fullscreenElement ? '退出全屏' : '全屏') === document.getElementById('full').textContent, undefined, { timeout: 8000 });
 report.full = await gstate(() => ({ fs: !!document.fullscreenElement, label: document.getElementById('full').textContent }));
 if (report.full.fs) {
   await page.click('#full');
-  await page.waitForTimeout(300);
+  await page.waitForFunction(() => (document.fullscreenElement ? '退出全屏' : '全屏') === document.getElementById('full').textContent, undefined, { timeout: 8000 });
   report.fullAfterExit = await gstate(() => ({ fs: !!document.fullscreenElement, label: document.getElementById('full').textContent }));
 }
 
-for (let d = 2; d <= 3; d++) {
+for (let d = 2; d <= 5; d++) {
   for (let i = d === 2 ? 1 : 0; i < 5; i++) {
     await order('good');
     await wait(i === 4 ? 'newspaper' : 'workbench');
   }
   await page.evaluate(() => window.__game.nextDay());
-  await wait(d === 3 ? 'ending' : 'daycard');
-  if (d === 2) await wait('workbench');
+  await wait(d === 5 ? 'ending' : 'daycard');
+  if (d < 5) await wait('workbench');
 }
 report.ending = await gstate(() => ({ scene: window.__game.scene, stars: window.__game.S.stars.length, avg: window.__game.avg() }));
+report.hint = await gstate(() => hintOf(window.__game.question(), 3));
 
 await freshStart();
 await order('bad');

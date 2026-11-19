@@ -5,6 +5,9 @@ const BASES = [
   { name: '小土狗-7B', desc: '便宜耐造，偶尔装死' },
   { name: '卷王-Pro', desc: '贵，但卷得明明白白' },
   { name: '开源土制', desc: '社区养大的，性格随机' },
+  { name: '量子玄学-Q', desc: '答案处于叠加态，读完才坍缩' },
+  { name: '祖传-Legacy', desc: '训练数据停在 2019，梗有包浆' },
+  { name: '海归-ABC', desc: '中文夹英文，literally 很专业' },
 ];
 const PERSONAS = [
   { name: '老实人', coat: [172, 180, 152] },
@@ -15,11 +18,13 @@ const PERSONAS = [
   { name: '废话大师', coat: [150, 145, 136] },
   { name: '赛博判官', coat: [42, 50, 76], cost: 60 },
   { name: '废话文学宗师', coat: [239, 230, 208], cost: 90 },
+  { name: '牛马代言人', coat: [122, 100, 64], cost: 320 },
+  { name: '赛博月老', coat: [196, 72, 96], cost: 520 },
 ];
 const COSTS = ['省电档', '标准档', '氪金档'];
 const ALIGNS = ['放养', '常规', '宪法拉满'];
 
-const HIDDEN_QUESTIONS = [{ id: 'hongwen', cost: 50 }, { id: 'zhibo', cost: 80 }];
+const HIDDEN_QUESTIONS = [{ id: 'hongwen', cost: 50 }, { id: 'zhibo', cost: 80 }, { id: 'xiangqin', cost: 400 }];
 
 const INTRO = [
   ['恭喜。', '十月对齐彩票已开奖，你的名字被抽中了。'],
@@ -33,6 +38,8 @@ const NEWSPAPER = {
   days: [
     { head: '裁缝铺开业！', flavor: '对齐部发言人：我们对所有模型都非常 helpful。群众：先把温度调明白。' },
     { head: '五星与一星齐飞', flavor: '应用商店评论区的梗浓度已超标，卫生部建议配饭阅读。' },
+    { head: '隐藏外套黑市开张', flavor: '对齐币够厚的调参师已穿上牛马外套。群众：牛马竟是我自己。' },
+    { head: '量子模型通过验收', flavor: '专家组一致认定：答案既对又错。群众：那到底对不对？专家组：观测一下。' },
     { head: '年度评级今日揭晓', flavor: '对齐部：星级不是终点，是下一轮调参的起点。打工人：终点就是下班。' },
   ],
 };
@@ -50,4 +57,4 @@ const ENDINGS = {
 
 const OVER_LINES = ['商店均分跌破 3.0。', '应用商店已将你的模型下架。', '下架理由：人工智障，证据确凿。', '对齐部表示遗憾，并收回了你的衣架。'];
 
-const DATE_STR = ['2026.11.16 星期一', '2026.11.17 星期二', '2026.11.18 星期三'];
+const DATE_STR = ['2026.11.16 星期一', '2026.11.17 星期二', '2026.11.18 星期三', '2026.11.19 星期四', '2026.11.20 星期五'];

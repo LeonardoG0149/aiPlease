@@ -2,7 +2,7 @@
 // 全局进度、存档、解锁、流程推进。
 
 const SAVE_KEY = 'ai-please-save-v1';
-const ORDERS_PER_DAY = 5, DAYS = 3;
+const ORDERS_PER_DAY = 5, DAYS = 5;
 const GAME = { result: null, newUnlocks: [], dayUnlocks: [] };
 let S = {};
 
@@ -53,7 +53,7 @@ GAME.submit = (res, score, stars, q) => {
   S.coins += gain;
   S.stars.push(stars);
   S.dayStars.push(stars);
-  const rev = reviewFor(stars, q.tag, S.stars.length * 13 + S.day);
+  const rev = reviewFor(stars, q, S.stars.length * 13 + S.day);
   GAME.result = Object.assign({}, res, { score, stars, q, rev, gain, orderNo: S.orderIdx + 1 });
   GAME.newUnlocks = [];
   checkUnlocks();

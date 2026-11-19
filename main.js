@@ -9,6 +9,7 @@ const st = () => now - sceneT0;
 function go(name) {
   clearTimers();
   FLASH = null;
+  if (!S.params && name !== 'title' && name !== 'intro') { if (!loadSave()) newGame(); }
   scene = name; sceneT0 = now;
   lastKey = -1;
   const sc = SCENES[name];
