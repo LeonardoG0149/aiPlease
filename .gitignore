@@ -1,1 +1,2 @@
 *.qoder.site
+__pycache__/
