@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1a1512">
+<meta name="description" content="AI, PLEASE：给 AI 娃娃换装调参的像素小游戏。温度、上下文、人设、对齐……同一道热梗问题，不同搭配产出完全不同的答案，等着应用商店的星级审判。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI, PLEASE · 请调好你的模型">
+<meta property="og:description" content="A MODEL DRESS-UP THRILLER：像素风 AI 调参换装小游戏，全程序生成画面与音效。">
+<title>AI, PLEASE · 请调好你的模型</title>
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABLUlEQVR42t1Xyw2DMAxNokxRdQ4OzJEDh4oZGIAjAzAD4sCBOTh0DsQa7aVIVho7cSANqo989J6fX2Jbik887reX+GGM6yaFEELlAIeYMgc4DB3zU2MK5/N+fqYjAEGbaXETqEo2maASNKZAQbHoqzKIBElgz5oLbitCEUEJxGQdo4YSmUMdyX7u6jADTwt6chQXHAP1kcFIsEtg2uELbO5qYdrhvBL4MoQkbPDQsjgvIkp+COrKlnoHy2CfCM2V35XlkRJorvyh34QS0pzMKULJTbgDu+Te/cE1IMsDvjpDf3DUUHY/hy0VkxiC2PcCBe7qCeyLiCpBcg9QGcaa0NmOz2zFvpassNkO88LfzQPXHckuMZReZixPuZhkX83UvqXmiHHdpIKrco71/A3Xf8M4EeFWCQAAAABJRU5ErkJggg==">
+<style>
+  html, body { margin: 0; height: 100%; background: #1a1512; overflow: hidden; }
+  body { display: flex; align-items: center; justify-content: center; font-family: system-ui, sans-serif; }
+  canvas {
+    display: block; image-rendering: pixelated; image-rendering: crisp-edges;
+    touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  }
+  @media (pointer: fine) { canvas { cursor: none; } }
+  .ui { position: fixed; top: 6px; right: 8px; display: flex; gap: 6px; z-index: 2; }
+  .ui button {
+    font: 12px system-ui, sans-serif; color: #968f87; background: rgba(26, 21, 18, 0.7);
+    border: 1px solid #4a4440; border-radius: 3px; padding: 3px 8px; cursor: pointer;
+  }
+  .ui button:hover { color: #efe6d0; }
+  @media (max-height: 500px) { .ui { top: 2px; right: 2px; opacity: 0.55; } .ui button { font-size: 10px; padding: 1px 5px; } }
+  #rotate {
+    display: none; position: fixed; inset: 0; z-index: 3; background: rgba(26, 21, 18, 0.92);
+    color: #e8a33d; font-size: 16px; text-align: center; align-items: center; justify-content: center;
+    flex-direction: column; gap: 10px; padding: 24px;
+  }
+  #rotate small { color: #968f87; font-size: 13px; }
+  @media (orientation: portrait) and (max-width: 700px) { #rotate.show { display: flex; } }
+  noscript { color: #efe6d0; }
+</style>
+</head>
+<body>
+<canvas id="game" width="640" height="360" aria-label="AI, PLEASE 游戏画面"></canvas>
+<div class="ui">
+  <button id="mute" type="button">声音：开</button>
+  <button id="full" type="button">全屏</button>
+</div>
+<div id="rotate" class="show">
+  <div>把手机横过来玩</div>
+  <small>竖屏也能玩，但字会很小</small>
+  <button type="button" onclick="this.parentNode.classList.remove('show')" style="margin-top:8px;padding:6px 14px;background:#8e2f2f;color:#efe6d0;border:1px solid #e8a33d;border-radius:3px;font-size:14px">先竖着玩</button>
+</div>
+<noscript>这个游戏需要开启 JavaScript。</noscript>
+<script src="assets.js"></script>
+<script src="gfx.js"></script>
+<script src="sfx.js"></script>
+<script src="engine.js"></script>
+<script src="content/questions.js"></script>
+<script src="content/reviews.js"></script>
+<script src="content/unlocks.js"></script>
+<script src="rules.js"></script>
+<script src="doll.js"></script>
+<script src="workbench.js"></script>
+<script src="scenes.js"></script>
+<script src="game.js"></script>
+<script src="main.js"></script>
+<script>
+  document.getElementById('mute').addEventListener('click', () => toggleMute());
+  const fullBtn = document.getElementById('full');
+  const root = document.documentElement;
+  if (!root.requestFullscreen && !root.webkitRequestFullscreen) fullBtn.style.display = 'none';
+  fullBtn.addEventListener('click', () => {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      return;
+    }
+    const p = (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+    if (p && p.then) p.then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape').catch(() => {})).catch(() => {});
+  });
+  const syncFull = () => { fullBtn.textContent = (document.fullscreenElement || document.webkitFullscreenElement) ? '退出全屏' : '全屏'; };
+  document.addEventListener('fullscreenchange', syncFull);
+  document.addEventListener('webkitfullscreenchange', syncFull);
+</script>
+</body>
+</html>
