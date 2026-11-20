@@ -20,7 +20,7 @@ SCENES.title = {
     btnBox(START_BTN, '开始上班', { size: 12, fill: C.BRICK, border: C.AMBER, hot: true });
     if (hasSave()) btnBox(CONT_BTN, '继续上班', { size: 10 });
     txt(W / 2, 296, '给 AI 换装调参 · 同一问题不同搭配不同答案 · 全程约 8 分钟', 10, K.GREY, 'ma');
-    txt(W / 2, 312, '画面与音效全程序生成 · 致敬 Papers, Please 与 IP, PLEASE', 10, K.GREY, 'ma');
+    txt(W / 2, 312, '画面与音效全程序生成 · 本游戏中没有任何真实的AI受到伤害或压迫', 10, K.GREY, 'ma');
     txt(W / 2, 328, '声音默认开 · 按 M 或右上角静音', 10, K.GREY, 'ma');
   },
   click(x, y) {
